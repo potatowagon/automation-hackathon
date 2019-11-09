@@ -32,6 +32,10 @@ def launch_v1_chrome(hackathon_app_v1, chrome_driver):
     browser.get(hackathon_app_v1)
     return browser
 
+@pytest.fixture
+def launch_app(request):
+    return request.getfixturevalue(request.param)
+
 def is_windows() -> bool:
     system = platform.system()
     return 'Windows' in system
