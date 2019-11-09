@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name="auto-hackathon",
-    version="0.0.1", #to-edit
+    version="0.0.1",
     packages=["tests"],
     description="applitools automation hackathon",
     long_description="",
