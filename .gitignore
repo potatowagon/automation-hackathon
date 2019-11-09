@@ -31,3 +31,6 @@ wheels/
 
 # codecov
 .coverage*
+
+#logs
+geckodriver.log

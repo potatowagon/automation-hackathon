@@ -27,8 +27,22 @@ def chrome_driver():
         return None
 
 @pytest.fixture()
+def firefox_driver():
+    if is_windows():
+        return os.path.join(TEST_DIR, "externals", "geckodriver_win32", "geckodriver.exe")
+    else:
+        print("OS not supported")
+        return None
+
+@pytest.fixture()
 def launch_v1_chrome(hackathon_app_v1, chrome_driver):
     browser = webdriver.Chrome(chrome_driver)
+    browser.get(hackathon_app_v1)
+    return browser
+
+@pytest.fixture()
+def launch_v1_firefox(hackathon_app_v1, firefox_driver):
+    browser = webdriver.Firefox(executable_path=firefox_driver)
     browser.get(hackathon_app_v1)
     return browser
 

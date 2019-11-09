@@ -9,9 +9,11 @@ def test_launch_and_close_app(launch_v1_chrome):
 @pytest.mark.parametrize(
     "launch_app", [
         'launch_v1_chrome',
+        'launch_v1_firefox'
     ],
     indirect=['launch_app']
 )
 def test_login_page_UI_elements(launch_app):
     browser = launch_app
     assert "ACME demo app" in browser.title
+    browser.quit()
