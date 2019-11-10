@@ -100,8 +100,8 @@ def test_data_driven(launch_app):
         assert "https://demo.applitools.com/hackathonApp.html" == browser.current_url
         browser.back()
 
-    test_login_success("boop", "boop")
     test_login_success("boop", "beep")
+    test_login_success('" or ""="', '" or ""="')
 
 @pytest.mark.parametrize(
     "launch_app", [
