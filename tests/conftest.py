@@ -5,6 +5,7 @@ import pytest
 from selenium import webdriver
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
+opened_browsers = []
 
 @pytest.fixture()
 def hackathon_app_v1():
@@ -38,17 +39,26 @@ def firefox_driver():
 def launch_v1_chrome(hackathon_app_v1, chrome_driver):
     browser = webdriver.Chrome(chrome_driver)
     browser.get(hackathon_app_v1)
+    opened_browsers.append(browser)
     return browser
 
 @pytest.fixture()
 def launch_v1_firefox(hackathon_app_v1, firefox_driver):
     browser = webdriver.Firefox(executable_path=firefox_driver)
     browser.get(hackathon_app_v1)
+    opened_browsers.append(browser)
     return browser
 
 @pytest.fixture
 def launch_app(request):
     return request.getfixturevalue(request.param)
+
+@pytest.fixture(autouse=True)
+def quit_browsers():
+    yield
+    for browser in opened_browsers:
+        browser.quit()
+        opened_browsers.remove(browser)
 
 def is_windows() -> bool:
     system = platform.system()
