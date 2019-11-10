@@ -1,4 +1,5 @@
 import time
+import re
 
 import pytest
 from bs4 import BeautifulSoup
@@ -6,6 +7,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import StaleElementReferenceException
+
+def fresh_login(browser, username, password):
+    browser.find_element_by_id("username").send_keys(username)
+    browser.find_element_by_id("password").send_keys(password)
+    browser.find_element_by_id("log-in").click()
 
 def test_launch_and_close_app(launch_v1_chrome):
     browser = launch_v1_chrome
@@ -89,19 +95,36 @@ def test_data_driven(launch_app):
     test_login_fail("", "boop", "Username must be present")
 
     def test_login_success(username, password):
-        try:
-            username_input.send_keys(username)
-            password_input.send_keys(password)
-            login_button.click()
-        except  StaleElementReferenceException:
-            browser.find_element_by_id("username").send_keys(username)
-            browser.find_element_by_id("password").send_keys(password)
-            browser.find_element_by_id("log-in").click()
+        fresh_login(browser, username, password)
         WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.ID, 'time')))
         assert "https://demo.applitools.com/hackathonApp.html" == browser.current_url
         browser.back()
 
     test_login_success("boop", "boop")
     test_login_success("boop", "beep")
+
+@pytest.mark.parametrize(
+    "launch_app", [
+        'launch_v1_chrome',
+        'launch_v1_firefox'
+    ],
+    indirect=['launch_app']
+)
+def test_table_sort(launch_app):
+    browser = launch_app
+    fresh_login(browser, "beep", "boop")
+    amount_header = browser.find_element_by_id("amount")
+    amount_header.click()
+    trans_table_rows = browser.find_element_by_id("transactionsTable").find_element_by_tag_name("tbody").find_elements_by_tag_name("tr")
+
+    def get_amount_val_from_cell(td_ele):
+        val = td_ele.get_attribute('innerText')
+        return float(re.sub(r'[^-\.\d]', "", val))
+
+    prev_val = get_amount_val_from_cell(trans_table_rows[0].find_elements_by_tag_name("td")[-1])
+    for row in trans_table_rows[1:]:
+        val = get_amount_val_from_cell(row.find_elements_by_tag_name("td")[-1])
+        assert val > prev_val
+        prev_val = val
 
 
