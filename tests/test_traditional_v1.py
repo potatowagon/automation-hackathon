@@ -37,11 +37,25 @@ def test_login_page_UI_elements(launch_app):
     assert "password" == password_form.input.get('type')
     assert "pre-icon os-icon os-icon-fingerprint" == ' '.join(password_form.div.get('class'))
 
-    login_button = browser.find_element_by_id("log-in")
+    buttons_w = browser.find_element_by_class_name("buttons-w")
+    login_button = buttons_w.find_element_by_id("log-in")
     assert "button" == login_button.get_attribute('tagName').lower()
     assert "Log In" == login_button.get_attribute('innerText')
 
-    remember_me_cb = browser.find_element_by_class_name("form-check-inline")
+    remember_me_cb = buttons_w.find_element_by_class_name("form-check-inline")
     assert "checkbox" == remember_me_cb.find_element_by_class_name("form-check-input").get_attribute("type")
     assert "Remember Me" == remember_me_cb.get_attribute("innerText")
+
+    icons = buttons_w.find_elements_by_tag_name("a")
+    icons_img_src = [
+        "img/social-icons/twitter.png",
+        "img/social-icons/facebook.png",
+        "img/social-icons/linkedin.png",
+    ]
+    for icon in icons:
+        assert icon.get_attribute('href').endswith("#")
+        icon_img_src = icon.find_element_by_tag_name("img").get_attribute("src").replace("https://demo.applitools.com/", "")
+        assert icon_img_src in icons_img_src
+        icons_img_src.remove(icon_img_src)
+    assert icons_img_src == []
 
