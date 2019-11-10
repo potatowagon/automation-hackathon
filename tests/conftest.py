@@ -5,6 +5,7 @@ import pytest
 from selenium import webdriver
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))
+TIMEOUT = 10
 
 @pytest.fixture()
 def hackathon_app_v1():
@@ -37,7 +38,7 @@ def firefox_driver():
 @pytest.fixture()
 def launch_v1_chrome(hackathon_app_v1, chrome_driver):
     browser = webdriver.Chrome(chrome_driver)
-    browser.implicitly_wait(100)
+    browser.implicitly_wait(TIMEOUT)
     browser.get(hackathon_app_v1)
     yield browser
     browser.quit()
@@ -45,7 +46,7 @@ def launch_v1_chrome(hackathon_app_v1, chrome_driver):
 @pytest.fixture()
 def launch_v1_firefox(hackathon_app_v1, firefox_driver):
     browser = webdriver.Firefox(executable_path=firefox_driver)
-    browser.implicitly_wait(100)
+    browser.implicitly_wait(TIMEOUT)
     browser.get(hackathon_app_v1)
     yield browser
     browser.quit()
