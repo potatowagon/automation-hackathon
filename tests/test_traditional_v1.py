@@ -124,7 +124,7 @@ def test_table_sort(launch_app):
     prev_val = get_amount_val_from_cell(trans_table_rows[0].find_elements_by_tag_name("td")[-1])
     for row in trans_table_rows[1:]:
         val = get_amount_val_from_cell(row.find_elements_by_tag_name("td")[-1])
-        assert val > prev_val
+        assert val >= prev_val
         prev_val = val
 
 
