@@ -1,10 +1,11 @@
-import pytest
 import time
+
+import pytest
+from bs4 import BeautifulSoup
 
 def test_launch_and_close_app(launch_v1_chrome):
     browser = launch_v1_chrome
     time.sleep(5)
-    browser.quit()
 
 @pytest.mark.parametrize(
     "launch_app", [
@@ -16,4 +17,6 @@ def test_launch_and_close_app(launch_v1_chrome):
 def test_login_page_UI_elements(launch_app):
     browser = launch_app
     assert "ACME demo app" in browser.title
-    browser.quit()
+    logo = BeautifulSoup(browser.find_element_by_class_name("logo-w").get_attribute("innerHTML"), "html.parser")
+    assert logo.a.get('href') == "index.html"
+    assert logo.img.get('src') == "img/logo-big.png"

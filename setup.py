@@ -14,7 +14,7 @@ setup(
     author_email="e0007652@u.nus.edu",
     url="https://github.com/potatowagon/automation-hackathon.git",
     keywords=["automation", "hackathon"],
-    install_requires=["selenium", "eyes-selenium", "pytest"],
+    install_requires=["selenium", "eyes-selenium", "pytest", "beautifulsoup4"],
     extras_require={
         "dev": [
             "codecov>=2.0.15",
