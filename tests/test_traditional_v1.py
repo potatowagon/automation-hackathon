@@ -2,6 +2,10 @@ import time
 
 import pytest
 from bs4 import BeautifulSoup
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.common.exceptions import StaleElementReferenceException
 
 def test_launch_and_close_app(launch_v1_chrome):
     browser = launch_v1_chrome
@@ -83,4 +87,21 @@ def test_data_driven(launch_app):
     test_login_fail("", "", "Both Username and Password must be present")
     test_login_fail("boop", "", "Password must be present")
     test_login_fail("", "boop", "Username must be present")
+
+    def test_login_success(username, password):
+        try:
+            username_input.send_keys(username)
+            password_input.send_keys(password)
+            login_button.click()
+        except  StaleElementReferenceException:
+            browser.find_element_by_id("username").send_keys(username)
+            browser.find_element_by_id("password").send_keys(password)
+            browser.find_element_by_id("log-in").click()
+        WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.ID, 'time')))
+        assert "https://demo.applitools.com/hackathonApp.html" == browser.current_url
+        browser.back()
+
+    test_login_success("boop", "boop")
+    test_login_success("boop", "beep")
+
 
