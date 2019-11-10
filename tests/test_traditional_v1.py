@@ -59,3 +59,28 @@ def test_login_page_UI_elements(launch_app):
         icons_img_src.remove(icon_img_src)
     assert icons_img_src == []
 
+@pytest.mark.parametrize(
+    "launch_app", [
+        'launch_v1_chrome',
+        'launch_v1_firefox'
+    ],
+    indirect=['launch_app']
+)
+def test_data_driven(launch_app):
+    browser = launch_app
+    username_input = browser.find_element_by_id("username")
+    password_input = browser.find_element_by_id("password")
+    login_button = browser.find_element_by_id("log-in")
+
+    def test_login_fail(username, password, expected_error_msg):
+        username_input.send_keys(username)
+        password_input.send_keys(password)
+        login_button.click()
+        assert expected_error_msg == browser.find_element_by_xpath("//*[starts-with(@id,'random_id_')]").get_attribute("innerText")
+        username_input.clear()
+        password_input.clear()
+
+    test_login_fail("", "", "Both Username and Password must be present")
+    test_login_fail("boop", "", "Password must be present")
+    test_login_fail("", "boop", "Username must be present")
+
