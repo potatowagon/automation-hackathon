@@ -127,4 +127,30 @@ def test_table_sort(launch_app):
         assert val >= prev_val
         prev_val = val
 
+@pytest.mark.parametrize(
+    "launch_app", [
+        'launch_v1_chrome',
+        'launch_v1_firefox'
+    ],
+    indirect=['launch_app']
+)
+def test_canvas_chart(launch_app):
+    browser = launch_app
+    fresh_login(browser, "beep", "boop")
+    browser.find_element_by_id("showExpensesChart").click()
+    # unable to automate without computer vision (eg. open CV). Reason: Change is not reflected in the DOM
+
+@pytest.mark.parametrize(
+    "launch_app", [
+        'launch_v1_chrome',
+        'launch_v1_firefox'
+    ],
+    indirect=['launch_app']
+)
+def test_dynamic_content(launch_app):
+    browser = launch_app
+    browser.get("https://demo.applitools.com/hackathon.html?showAd=true")
+    fresh_login(browser, "beep", "boop")
+    assert "img/flashSale.gif" in browser.find_element_by_id("flashSale").find_element_by_tag_name("img").get_attribute("src")
+    assert "img/flashSale2.gif" in browser.find_element_by_id("flashSale2").find_element_by_tag_name("img").get_attribute("src")
 
