@@ -1,5 +1,6 @@
 import time
 import re
+import pytest_check as check
 
 import pytest
 from bs4 import BeautifulSoup
@@ -26,35 +27,35 @@ def test_launch_and_close_app(launch_v1_chrome):
 )
 def test_login_page_UI_elements(launch_app):
     browser = launch_app
-    assert "ACME demo app" in browser.title
+    check.is_in("ACME demo app", browser.title)
     logo = BeautifulSoup(browser.find_element_by_class_name("logo-w").get_attribute("innerHTML"), "html.parser")
-    assert "index.html" == logo.a.get('href')
-    assert "img/logo-big.png" == logo.img.get('src')
-    assert "Login Form" in browser.find_element_by_class_name("auth-header").get_attribute("innerText")
+    check.equal("index.html", logo.a.get('href'))
+    check.equal("img/logo-big.png", logo.img.get('src'))
+    check.is_in("Login Form", browser.find_element_by_class_name("auth-header").get_attribute("innerText"))
 
     forms = browser.find_elements_by_class_name("form-group")
     username_form = BeautifulSoup(forms[0].get_attribute("innerHTML"), "html.parser")
-    assert "Username" == username_form.label.string
-    assert "form-control" == username_form.input.get('class')[0]
-    assert "Enter your username" == username_form.input.get('placeholder')
-    assert "text" == username_form.input.get('type')
-    assert "pre-icon os-icon os-icon-user-male-circle" == ' '.join(username_form.div.get('class'))
+    check.equal("Username", username_form.label.string)
+    check.equal("form-control", username_form.input.get('class')[0])
+    check.equal("Enter your username", username_form.input.get('placeholder'))
+    check.equal("text", username_form.input.get('type'))
+    check.equal("pre-icon os-icon os-icon-user-male-circle", ' '.join(username_form.div.get('class')))
 
     password_form = BeautifulSoup(forms[1].get_attribute("innerHTML"), "html.parser")
-    assert "Password" == password_form.label.string
-    assert "form-control" == password_form.input.get('class')[0]
-    assert "Enter your password" == password_form.input.get('placeholder')
-    assert "password" == password_form.input.get('type')
-    assert "pre-icon os-icon os-icon-fingerprint" == ' '.join(password_form.div.get('class'))
+    check.equal("Password", password_form.label.string)
+    check.equal("form-control", password_form.input.get('class')[0])
+    check.equal("Enter your password", password_form.input.get('placeholder'))
+    check.equal("password", password_form.input.get('type'))
+    check.equal("pre-icon os-icon os-icon-fingerprint", ' '.join(password_form.div.get('class')))
 
     buttons_w = browser.find_element_by_class_name("buttons-w")
     login_button = buttons_w.find_element_by_id("log-in")
-    assert "button" == login_button.get_attribute('tagName').lower()
-    assert "Log In" == login_button.get_attribute('innerText')
+    check.equal("button", login_button.get_attribute('tagName').lower())
+    check.equal("Log In", login_button.get_attribute('innerText'))
 
     remember_me_cb = buttons_w.find_element_by_class_name("form-check-inline")
-    assert "checkbox" == remember_me_cb.find_element_by_class_name("form-check-input").get_attribute("type")
-    assert "Remember Me" == remember_me_cb.get_attribute("innerText")
+    check.equal("checkbox", remember_me_cb.find_element_by_class_name("form-check-input").get_attribute("type"))
+    check.equal("Remember Me", remember_me_cb.get_attribute("innerText"))
 
     icons = buttons_w.find_elements_by_tag_name("a")
     icons_img_src = [
@@ -63,11 +64,11 @@ def test_login_page_UI_elements(launch_app):
         "img/social-icons/linkedin.png",
     ]
     for icon in icons:
-        assert icon.get_attribute('href').endswith("#")
+        check.is_true(icon.get_attribute('href').endswith("#"))
         icon_img_src = icon.find_element_by_tag_name("img").get_attribute("src").replace("https://demo.applitools.com/", "")
-        assert icon_img_src in icons_img_src
+        check.is_in(icon_img_src, icons_img_src)
         icons_img_src.remove(icon_img_src)
-    assert icons_img_src == []
+    check.equal(icons_img_src, [])
 
 @pytest.mark.parametrize(
     "launch_app", [
@@ -86,7 +87,7 @@ def test_data_driven(launch_app):
         username_input.send_keys(username)
         password_input.send_keys(password)
         login_button.click()
-        assert expected_error_msg == browser.find_element_by_xpath("//*[starts-with(@id,'random_id_')]").get_attribute("innerText")
+        check.equal(expected_error_msg, browser.find_element_by_xpath("//*[starts-with(@id,'random_id_')]").get_attribute("innerText"))
         username_input.clear()
         password_input.clear()
 
@@ -97,7 +98,7 @@ def test_data_driven(launch_app):
     def test_login_success(username, password):
         fresh_login(browser, username, password)
         WebDriverWait(browser, 10).until(EC.element_to_be_clickable((By.ID, 'time')))
-        assert "https://demo.applitools.com/hackathonApp.html" == browser.current_url
+        check.equal("https://demo.applitools.com/hackathonApp.html", browser.current_url)
         browser.back()
 
     test_login_success("boop", "beep")
@@ -124,7 +125,7 @@ def test_table_sort(launch_app):
     prev_val = get_amount_val_from_cell(trans_table_rows[0].find_elements_by_tag_name("td")[-1])
     for row in trans_table_rows[1:]:
         val = get_amount_val_from_cell(row.find_elements_by_tag_name("td")[-1])
-        assert val >= prev_val
+        check.is_true(val >= prev_val)
         prev_val = val
 
 @pytest.mark.parametrize(
@@ -151,6 +152,6 @@ def test_dynamic_content(launch_app):
     browser = launch_app
     browser.get("https://demo.applitools.com/hackathon.html?showAd=true")
     fresh_login(browser, "beep", "boop")
-    assert "img/flashSale.gif" in browser.find_element_by_id("flashSale").find_element_by_tag_name("img").get_attribute("src")
-    assert "img/flashSale2.gif" in browser.find_element_by_id("flashSale2").find_element_by_tag_name("img").get_attribute("src")
+    check.is_in("img/flashSale.gif", browser.find_element_by_id("flashSale").find_element_by_tag_name("img").get_attribute("src"))
+    check.is_in("img/flashSale2.gif",  browser.find_element_by_id("flashSale2").find_element_by_tag_name("img").get_attribute("src"))
 
