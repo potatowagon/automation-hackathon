@@ -51,6 +51,22 @@ def launch_v1_firefox(hackathon_app_v1, firefox_driver):
     yield browser
     browser.quit()
 
+@pytest.fixture()
+def launch_v2_chrome(hackathon_app_v2, chrome_driver):
+    browser = webdriver.Chrome(chrome_driver)
+    browser.implicitly_wait(TIMEOUT)
+    browser.get(hackathon_app_v2)
+    yield browser
+    browser.quit()
+
+@pytest.fixture()
+def launch_v2_firefox(hackathon_app_v2, firefox_driver):
+    browser = webdriver.Firefox(executable_path=firefox_driver)
+    browser.implicitly_wait(TIMEOUT)
+    browser.get(hackathon_app_v2)
+    yield browser
+    browser.quit()
+
 @pytest.fixture
 def launch_app(request):
     return request.getfixturevalue(request.param)
